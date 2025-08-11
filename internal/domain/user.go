@@ -1,5 +1,7 @@
 package domain
 
+import "context"
+
 type User struct {
 	ID        int    `db:"id"`
 	FirstName string `db:"first_name"`
@@ -7,7 +9,9 @@ type User struct {
 	Email     string `db:"email"`
 }
 
-type UserRepository interface {
-	GetByID(id int) (*User, error)
-	Save(user *User) error
+type UserRepo interface {
+	GetByID(ctx context.Context, id int) (*User, error)
+	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, user *User) error
+	Delete(ctx context.Context, id int) error
 }
