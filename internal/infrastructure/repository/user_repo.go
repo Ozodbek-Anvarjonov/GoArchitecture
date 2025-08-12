@@ -14,6 +14,30 @@ type userRepo struct {
 func NewUserRepo(db *sql.DB) domain.UserRepo {
 	return &userRepo{db: db}
 }
+
+func (r *userRepo) Get(ctx context.Context) ([]domain.User, error) {
+	query := `SELECT * FROM users ORDER BY id DESC`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	var users []domain.User
+	for rows.Next() {
+		var u domain.User
+		if err := rows.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (r *userRepo) GetByID(ctx context.Context, id int) (*domain.User, error) {
 	user := new(domain.User)
 	query := `SELECT * FROM users WHERE id = $1`

@@ -7,6 +7,7 @@ import (
 )
 
 type UserService interface {
+	Get(ctx context.Context) ([]domain.User, error)
 	GetByID(ctx context.Context, id int) (*domain.User, error)
 	Create(ctx context.Context, user *domain.User) (int, error)
 	Update(ctx context.Context, user *domain.User) error
@@ -19,6 +20,18 @@ type userService struct {
 
 func NewUserService(userRepo domain.UserRepo) UserService {
 	return &userService{userRepo: userRepo}
+}
+
+func (s *userService) Get(ctx context.Context) ([]domain.User, error) {
+	users, err := s.userRepo.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if users == nil {
+		return nil, errors.New("user not found")
+	}
+
+	return users, nil
 }
 
 func (s *userService) GetByID(ctx context.Context, id int) (*domain.User, error) {
